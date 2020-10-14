@@ -10,24 +10,42 @@ const App = () => {
     const [temp, setTemp]               = useState('');
 
     async function getWeather(){
-        const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${cityName},${countryName}&units=${tempUnit}&APPID=${apiKey}`, {mode: 'cors'});
-        const weatherData = await response.json();
-        console.log(weatherData);
-        setTemp(Math.round(weatherData.main.temp))
+        try{
+            const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${cityName},${countryName}&units=${tempUnit}&APPID=${apiKey}`, {mode: 'cors'});
+            const weatherData = await response.json();
+            console.log(weatherData);
+            setTemp(Math.round(weatherData.main.temp))
+        }
+        catch(error){
+            console.log(error)
+        }
     }
 
-    useEffect( () => {
-        getWeather();
-    }, [cityName, countryName, tempUnit])
-    
     const handleClick = () => {
         tempUnit === 'imperial' ? setTempUnit('metric') : setTempUnit('imperial');
+        getWeather();
+    }
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        console.log(event.target.nameField.value)
+        setCityName(event.target.nameField.value)
+        getWeather();
     }
 
     return (
         <div>
-            <div>{cityName} is {} {countryName} and boy is it {temp} {tempUnit === 'imperial' ? 'F' : 'C'}</div>
-            <button onClick={handleClick}>Unit</button>
+            <div>{cityName},{countryName} and boy is it {temp} {tempUnit === 'imperial' ? 'F' : 'C'}</div>
+            <form onSubmit={handleSearch}>
+                <label>Searchy</label>
+                <input 
+                    placeholder='City Name'
+                    name='nameField'
+                    // onChange={(e) => setCityName(e.target.value)}
+                />
+                <button>Search</button>
+            </form>
+            <button onClick={handleClick}>unit</button>
         </div>
     );
 }
